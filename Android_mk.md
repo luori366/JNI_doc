@@ -69,8 +69,32 @@ LOCAL_CPP_FEATURES := exceptions #指定C++代码使用了C++异常
 指定当编译C/C++源码的时候，传给编译器的标志
 ####LOCAL_CPPFLAGS 
 编译C++代码的时候传递给编译器的选项（编译C代码不会用这里的选项）
+####LOCAL_STATIC_LIBRARIES
+指定应该链接到当前模块的静态库（可指定多个）。当前模块是动态库时，该选项才有意义
+####LOCAL_SHARED_LIBRARIES
+指定的是运行时该模块所依赖共享库（可指定多个）。这些信息是链接阶段必须的。
 ####LOCAL_WHOLE_STATIC_LIBRARIES
 它是LOCAL_STATIC_LIBRARIES的变体，用来表示它对应的模块对于linker来说应该是一个“whole archive”.
+当静态库之间有循环依赖时，会用到这个选项
+####LOCAL_LDLIBS
+用来指定模块编译时的其余连接器标志
+```
+LOCAL_LDLIBS := -lz #告诉链接器在加载该共享库的时候必须链接 /system/lib/libz.so 这个共享库
+```
+常用的链接库可以查看这里[Stable APIs](http://blog.csdn.net/smfwuxiao/article/details/6590723)
+####LOCAL_ALLOW_UNDEFINED_SYMBOLS
+####LOCAL_DISABLE_NO_EXECUTE
+####LOCAL_EXPORT_CFLAGS
+这个变量定义一些C/C++编译器flags。这些flags（标志）会被追加到使用了这个模块
+```
+LOCAL_EXPORT_CFLAGS := -DFOO=1 #编译foo模块时声明了此变量
+LOCAL_CFLAGS := -DBAR=2        #编译bar模块时声明了此变量
+LOCAL_STATIC_LIBRARIES := foo  #依赖foo模块，这样编译bar模块时传递给编译器的标志就是“-DFOO=1 -DBAR=2”
+```
+####LOCAL_EXPORT_CPPFLAGS
+####LOCAL_EXPORT_C_INCLUDES
+####LOCAL_EXPORT_LDLIBS
+####LOCAL_FILTER_ASM
 
 ##NDK预定义宏函数
 下面是NDK预定义的“函数”宏，用法是  $(call <function>) ，返回的是文本信息
@@ -89,4 +113,50 @@ LOCAL_CPP_FEATURES := exceptions #指定C++代码使用了C++异常
  $(call import-module,<name>) #在 NDK_MODULE_PATH变量所指定的目录列表中寻找名为<name>的模块，找到之后将包含进来
 ```
 
-                                
+##预编译
+通过预编译，可以使用一个提前编译好的库（预编译库）来加速编译过程，或者向第三方NDK开发人员发布你的共享库而不用提供源码
+
+###声明一个预编译库的模块
+```
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+LOCAL_MODULE := foo-prebuilt
+LOCAL_SRC_FILES := libfoo.so
+include $(PREBUILT_SHARED_LIBRARY) #如果你的库是共享库，则包含 PREBUILT_SHARED_LIBRARY;如果是静态库，则包含 PREBUILT_STATIC_LIBRARY
+```
+
+###在其他模块中引用这个预编译库
+```
+include $(CLEAR_VARS)
+LOCAL_MODULE := foo-user
+LOCAL_SRC_FILES := foo-user.c
+LOCAL_SHARED_LIBRARIES := foo-prebuilt
+include $(BUILD_SHARED_LIBRARY)
+```
+
+###将预编译库的头文件导出
+```
+include $(CLEAR_VARS)
+LOCAL_MODULE := foo-prebuilt
+LOCAL_SRC_FILES := libfoo.so
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/include
+include $(PREBUILT_SHARED_LIBRARY)
+```
+
+##编译C/C++常用链接库
+```
+LOCAL_LDLIBS := -lXXX #XXX标识链接库名
+```
+|库名称          |符号          |特性                                  |  
+|-----------     |------------- |------------------------------------- |  
+|C库             |              |不需要指定                            |  
+|数学库          |-lm           |不需要指定                            |
+|C++库           |-lstdc++等    |不需要指定                            |  
+|android log     |-llog         |包含<android/log.h>，使用Android log  |  
+|zlib            |-lz           |包含<zlib.h> 和 <zconf.h>             |
+|动态链接器      |-ldl          |包含<dlfcn.h>,提供dlopen,dlsym等函数  |  
+|OpenGL ES 1.x 库|-lGLESv1_CM.so|包含 <GLES/gl.h> 和 <GLES/glext.h>    |  
+|OpenGL ES 2.0   |-lGLESv2.so   |包含<GLES2/gl2.h> 和 <GLES2/gl2ext.h> |
+|jnigraphics     |-ljnigraphics |提供对Java中的 bitmap 对象的操作      |                              
+|OpenSL ES音频库 |-lOpenSLES    |                                      |  
+|本地android     |-landroid     |用C/C++来写android程序                |  
