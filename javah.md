@@ -85,3 +85,5 @@ javah -d . -jni -classpath . PinyinDecoderService
 ##Eclipse中的配置和用法
 如果想在eclipse中使用外部命令的方式使用javah生成某个文件的头文件，需要做一些配置，参考
 [Eclipse中一键调用javah生成jni的头文件](http://blog.csdn.net/s098668/article/details/8255734)
+
+细节不再介绍，但是其指导思想永远只有一条：为javah命令配置合适的参数
