@@ -60,3 +60,28 @@ ENVIRONMENT VARIABLES
   CLASSPATH
   一个系统环境变量，用冒号分开(linux下，windows下用分号隔开)。为java程序提供了默认的查找路径。
 ```
+
+##命令行用法示例
+假设我的文件系统中有这样的一个文件：
+/home/user/android-4.4/packages/inputmethods/PinyinIME/src/com/android/inputmethod/pinyin/PinyinDecoderService.java
+里面定义了很多native方法，我想生成它的头文件，当前我的工作目录是/home/user
+
+可以这样做：
+```shell
+javah -d . -jni -classpath /home/user/android-4.4/packages/inputmethods/PinyinIME/src com.android.inputmethod.pinyin.PinyinDecoderService  
+#javah -d 目标文件路径 -jni -classpath 源文件根目录 源文件包名路径
+#生成的头文件是这样的：com_android_inputmethod_pinyin_PinyinDecoderService.h
+#源文件包名路径可以查看源文件的行首，比如PinyinDecoderService中是这样的
+#package com.android.inputmethod.pinyin; 
+```
+
+假如一个java文件并不在一个路径系统中，只是单独的一个文件怎么做？同样以PinyinDecoderService.java为例，不过要先删掉头部的
+package说明，并将它拷贝到/home/user下面
+```shell
+javah -d . -jni -classpath . PinyinDecoderService
+#这样做当前路径下就生成了一个头文件：PinyinDecoderService.h
+```
+
+##Eclipse中的配置和用法
+如果想在eclipse中使用外部命令的方式使用javah生成某个文件的头文件，需要做一些配置，参考
+[Eclipse中一键调用javah生成jni的头文件](http://blog.csdn.net/s098668/article/details/8255734)
