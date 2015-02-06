@@ -3,7 +3,7 @@
 本文档主要介绍javah的用法，以及怎样用它来生成jni类型的头文件
 
 ##jni中头文件的作用
-! [Head file](/head.png)
+![Head file](/head.png)
 
 ##javah的man文档翻译
 ```
