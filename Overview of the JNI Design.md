@@ -202,3 +202,95 @@ JNI函数必须确保不同线程的本地方法可以同步访问相同的数�
 组被两个线程pin的话，其中一个unpin不会影响另一个线程。
 
 ###字段和方法
+JNI允许本地代码通过名字和类型描述符来访问JAVA中的字段或调用JAVA中的方法。
+例如，为了读取类cls中的一个int实例字段：
+```C
+//本地方法首先要获取字段ID
+jfieldID fid = env->GetFieldID(env, cls, "i", "I"); 
+//然后可以多次使用这个ID，不需要再次查找，除非JVM把定义这个字段和方法的类或者接口unload，字段ID和方法ID会一直有效。
+jint value = env->GetIntField(env, obj, fid); 
+```
+字段和方法可以来自定个类或接口，也可以来自它们的父类或间接父类。JVM规范规定：如果两个类或者接口定义了相同的字段和方法
+，那么它们返回的字段ID和方法ID也一定会相同。例如，如果类B定义了字段fld，类C从B继承了字段fld，那么程序从这两个类上获
+取到的名字为“fld”的字段的字段ID是相同的。  
+JNI不会规定字段ID和方法ID在JVM内部如何实现。  
+通过JNI，程序只能访问那些已经知道名字和类型的字段和方法。而使用Java CoreReflection机制提供的API，程序员不用知道具体的
+信息就可以访问字段或者调用方法。有时在本地代码中调用反射机制也很有用。所以，JDK提供了一组API来在JNI字段ID和
+java.lang.reflect.Field 类的实例之间转换，另外一组在JNI方法ID和java.lang.reflect.Method类实例之间转换。
+
+##错误和异常
+JNI编程时的错误通常是JNI函数的误用导致的。比如，向GetFieldID方法传递一个对象引用而不是类引用等。
+
+###不检查编程错误
+JNI函数不对编程错误进行检查。向JNI函数传递非法参数会导致未知的行为。原因如下：
+- 强制JNI函数检查所有可能的错误会减慢所有本地方法的执行效率。
+- 大部分情况下，运行时没有足够的类型信息来做错误检查。
+
+###异常检查
+有两种方式可以检查异常：
+- 多数JNI函数以返回一个非正常的值来表示有一个错误发生了。
+- 当使用一个不能由返回值断定发生了错误的JNI函数时，native代码必须依赖提出的异常，来进行错误检查。
+
+```java
+class CatchThrow {
+    private native void doit() throws IllegalArgumentException;
+    private void callback() throws NullPointerException {
+        throw new NullPointerException("CatchThrow.callback");
+    }
+
+    public static void main(String args[]) {
+        CatchThrow c = new CatchThrow();
+        try {
+            c.doit();
+        } catch (Exception e) {
+            System.out.println("In Java:\n\t" + e);
+        }
+    }
+    static {
+        System.loadLibrary("CatchThrow");
+    }
+}
+```
+```C
+JNIEXPORT void JNICALL Java_CatchThrow_doit(JNIEnv *env, jobject obj)
+{
+    jthrowable exc;
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "callback", "()V");
+    if (mid == NULL) {
+        return;
+    }
+    (*env)->CallVoidMethod(env, obj, mid);          //调用Java方法
+    exc = (*env)->ExceptionOccurred(env);           //使用ExceptionOccurred检查异常      
+    if (exc) {
+        /* We don't do much with the exception, except that
+           we print a debug message for it, clear it, and
+           throw a new exception. */
+        jclass newExcCls;
+        (*env)->ExceptionDescribe(env);            //通过调用ExceptionDescribe函数来输出描述信息
+        (*env)->ExceptionClear(env);               //调用ExceptionClear来清除该异常
+        newExcCls = (*env)->FindClass(env, "java/lang/IllegalArgumentException");
+        if (newExcCls == NULL) {
+            /* Unable to find the exception class, give up. */
+            return;
+        }
+        (*env)->ThrowNew(env, newExcCls, "thrown from C code");  //向外抛出一个IlleagalArgumentException来代替
+    }
+}
+
+/* Native code that calls Fraction.floor. Assume method ID
+   MID_Fraction_floor has been initialized elsewhere. */
+void f(JNIEnv *env, jobject fraction)
+{
+    jint floor = (*env)->CallIntMethod(env, fraction,
+                                       MID_Fraction_floor);
+    /* important: check if an exception was raised */
+    if ((*env)->ExceptionCheck(env)) {            // 检查异常
+        return;
+    }
+    ... /* use floor */
+}
+```
+一个有JNI导致的异常，不会马上终止native方法的执行。这一点和java语言的不同，当java编程语言抛出了一个异常，VM会在自动
+转换控制流到最近的满足异常类型的try/catch语句，然后清除附加的异常，并且执行这个异常处理。与之对比，JNI程序员，在一个
+异常发生时必须显示地实现控制流。
