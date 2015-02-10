@@ -90,6 +90,7 @@ JNI，由jni本身去保证java方法和本地方法的链接，这样的本地�
 而直接从java函数原型映射到本地方法，编译加载库，用额外的操作保证java函数原型链接到本地方法，完成调用——这样的方
 式使用jni，本地方法的注册方式称为动态注册。其中“额外的操作”要由我们完成。
 
+####java函数原型
 假设在java文件里声明了一个函数原型:
 ```java
 private static native String nativeGetJniStringD();
