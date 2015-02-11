@@ -160,7 +160,6 @@ static int registerNatives(JNIEnv * env)
 
 ####实现JNI_onLoad方法
 JNI_onLoad方法在jni.h中定义，它在java类调用System.LoadLibarary方法后调用，去注册本地方法。
-可见，静态
 ```C
 /*
  *
@@ -186,3 +185,114 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void* reserved)
     return result;
 }
 ```
+
+###小结
+实现和链接本地方法有三种方式：
+- 通过头文件实现，静态注册
+- 直接实现，静态注册
+- 直接实现，动态注册
+
+三种方式其实互相独立，互不影响。所以在一个实现文件里，可以同时包含这三种实现方式。
+
+##JNI调用java
+
+###一个示例
+假设有个java层定义了一个类：
+```java
+package com.example.calljava;
+
+public class Student {
+	public static final String TAG = "Student";
+	
+	public String name;
+	private long score;
+
+	public Student(String name, long score) {
+		this.name = name;
+		this.score = score;
+	}
+
+	public long getScore() {
+		return score;
+	}
+
+	public void setScore(long score) {
+		this.score = score;
+	}
+
+	public static String getTag() {
+		return TAG;
+	}
+	
+	@Override
+	public String toString() {
+		return "Student [name=" + name + ", score=" + score + "]";
+	}
+}
+```
+类里面有public, private, static成员和方法，在JNI层去使用这个类:
+```C
+void jniCallJava(JNIEnv * env) {
+	jclass cls = NULL;
+	jmethodID mid = NULL;
+	jfieldID fid = NULL;
+	jobject obj = NULL;
+	jstring arg = NULL;
+	jstring ret = NULL;
+
+	//创建一个con.example.calljava.Student类的引用
+	cls = (*env)->FindClass(env, "com/example/calljava/Student");
+	//获取此类的构造函数
+	mid = (*env)->GetMethodID(env, cls, "<init>", "(Ljava/lang/String;J)V");
+	//创建一个实例
+	if (cls != NULL && mid != NULL) {
+		arg = (*env)->NewStringUTF(env, "Jack");
+		obj = (*env)->NewObject(env, cls, mid, arg, 100L);
+	}
+
+	fid = (*env)->GetFieldID(env, cls, "name", "Ljava/lang/String;");
+	if (fid != 0) {
+		//访问Student的name共有成员
+		ret = (jstring)(*env)->GetObjectField(env, obj, fid);
+
+		//修改Student的那么有成员
+		arg = (*env)->NewStringUTF(env, "icejoywoo");
+		(*env)->SetObjectField(env, obj, fid, arg);
+	}
+
+	//通过getter访问Student的score成员
+	mid = (*env)->GetMethodID(env, cls, "getScore", "()J");
+	if (mid != 0) {
+		jlong score = (*env)->CallLongMethod(env, obj, mid);
+	}
+	//通过setter方法修改Student的score成员
+	mid = (*env)->GetMethodID(env, cls, "setScore", "(J)V");
+	if (mid != 0) {
+		jlong math_score = 99;
+		(*env)->CallVoidMethod(env, obj, mid, math_score);
+	}
+
+	//调用toString方法
+	mid = (*env)->GetMethodID(env, cls, "toString", "()Ljava/lang/String;");
+	if (mid != 0) {
+		ret = (jstring)(*env)->CallObjectMethod(env, obj, mid);
+	}
+
+	fid = (*env)->GetStaticFieldID(env, cls, "TAG", "Ljava/lang/String;");
+	if (fid != 0) {
+		//访问Student的TAG静态共有成员
+		ret = (jstring)(*env)->GetStaticObjectField(env, cls, fid);
+	}
+
+	//调用静态共有方法
+	mid = (*env)->GetStaticMethodID(env, cls, "getTag", "()Ljava/lang/String;");
+	if (mid != 0) {
+		ret = (jstring)(*env)->CallStaticObjectMethod(env, cls, mid);
+	}
+}
+```
+###创建对象
+###访问public成员
+###访问public方法
+###访问public static成员
+###访问public static方法
