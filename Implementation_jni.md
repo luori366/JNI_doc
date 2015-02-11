@@ -2,6 +2,7 @@
 ============================
 本文档主要介绍如何实现jni头文件，包括JNI函数宏，JNI数据类型，Java，JNI和C/C++之间的数据传递；
 JNI调用JVM，动态注册本地方法等等。
+本文档里提到的JNI函数的更详细说明请查看：[JNI函数手册](/jni_function_mannual.md)
 
 ##Java调用JNI  
 
@@ -292,6 +293,14 @@ void jniCallJava(JNIEnv * env) {
 }
 ```
 ###创建对象
+创建java对象，就是要创建一个jobject实例。关于jobject将在jni数据结构里介绍，它的本质是一个结构体指针。
+- 首先创建一个java对象的引用，调用FindClass方法
+- 获取java对象的构造函数的映射，调用GetMethodID
+- 将构造函数里的java参数类型映射为jni数据类型，java基本类型数据映射成jni基本类型数据，java字符串映射成jstring，
+其他java类类型映射成jobject
+- 通过NewObject生产jni本地对象。
+
+
 ###访问public成员
 ###访问public方法
 ###访问public static成员
