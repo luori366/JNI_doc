@@ -302,6 +302,16 @@ void jniCallJava(JNIEnv * env) {
 
 
 ###访问public成员
+- 先使用GetFieldID， 获取成员的域对象jfieldID
+- 然后调用Get<type>Field，访问相应的域
+- 可以调用Set<type>Field来修改域成员，要注意此过程里的数据类型转换
+
 ###访问public方法
+- 先使用GetMethodID， 获取成员的域对象methodId
+- 然后调用Call<type>Method，Call<type>MethodA或Call<type>MethodV调用相应的Java方法
+
 ###访问public static成员
+与访问public成员方式相同，只要将用到的jni方法换成static版本的即可，比如GetFieldID换成GetStaticFieldID 
+
 ###访问public static方法
+与访问public成员方式相同，只要将用到的jni方法换成static版本的即可
