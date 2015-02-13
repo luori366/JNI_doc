@@ -321,17 +321,6 @@ jint GetVersion(JNIEnv *env);
 ###数组操作
 ```java
     /**
-     *
-     *
-     * @param
-     * @param
-     * @param
-     * @return
-     * @throw
-     */
-```
-```java
-    /**
      * 返回数组中的元素数
      *
      * @param array Java数组对象
@@ -349,7 +338,122 @@ jint GetVersion(JNIEnv *env);
      * @throw OutOfMemoryError 如果系统内存不足
      */
     jarray NewObjectArray(JNIEnv *env, jsize length, jclass elementClass, jobject initialElement);
+    
+    /**
+     * 返回Object数组的元素
+     *
+     * @param array Java数组
+     * @param index 元素索引
+     * @return Java 对象
+     * @throw ArrayIndexOutOfBoundsException 如果index不是数组中的有效下标
+     */    
+    jobject  GetObjectArrayElement (JNIEnv *env, jobjectArray array, jsize index);
+ 
+     /**
+     * 设置Object数组的元素
+     *
+     * @param array Java数组
+     * @param index 元素索引
+     * @param value 新的对象
+     * @throw ArrayIndexOutOfBoundsException 如果index不是数组中的有效下标
+     *      ArrayStoreException 如果value的类不是数组元素类的子类
+     */   
+    void  SetObjectArrayElement (JNIEnv *env, jobjectArray array,  jsize index, jobject value);
 ```
+
+####New<PrimitiveType>Array Routines
+```java
+    /**
+     * 用于构造基本类型数组对象
+     *
+     * @param array
+     * @param isCopy 
+     * @return Java 数组。如果无法构造该数组，则为 NULL
+     */
+    ArrayType New<PrimitiveType>Array(JNIEnv *env, jsize length); 
+```
+下表说明了特定的基本类型数组构造函数。用户应把New<PrimitiveType>Array替换为某个实际的基本类型数组构造函数例程名
+然后将 ArrayType替换为该例程相应的数组类型:  
+
+|NewPrimitiveTypeArray  |ArrayType    |  
+|-----------------------|-------------|   
+|NewBooleanArray()      |jbooleanArray|    
+|NewByteArray()         |jbyteArray   |  
+|NewCharArray()         |jcharArray   |  
+|NewShortArray()        |jshortArray  |  
+|NewIntArray()          |jintArray    |  
+|NewLongArray()         |jlongArray   |  
+|NewFloatArray()        |jfloatArray  |  
+|NewDoubleArray()       | jdoubleArray|  
+
+####Get<PrimitiveType>ArrayElements与Release<PrimitiveType>ArrayElements惯用法
+```java
+    /**
+     * 一组返回基本类型数组体的函数。结果在调用相应的 Release<PrimitiveType>ArrayElements()函数前将一直有效。
+     * 由于返回的数组可能是Java数组的副本，因此对返回数组的更改不必在基本类型数组中反映出来，直到调用了
+     * Release<PrimitiveType>ArrayElements()。
+     *
+     * @param array Java对象数组
+     * @param isCopy 如果isCopy不是NULL，*isCopy在复制完成后即被设为JNI_TRUE; 如果未复制，则设为JNI_FALSE
+     * @return 返回指向数组的指针，如果操作失败，则为 NULL
+     */
+    NativeType *Get<PrimitiveType>ArrayElements (JNIEnv *env, ArrayType array, jboolean *isCopy); 
+
+    /**
+     * 释放elems，通知本地代码不要再访问elems
+     *
+     * @param array Java数组对象
+     * @param elems 参数是一个通过使用对应的Get<PrimitiveType>ArrayElements() 函数由array导出的指针。
+     * @param mode 释放模式，mode参数将提供有关如何释放数组缓冲区的信息。
+     *  如果elems不是array中数组元素的副本，mode将无效; 否则，mode 将具有下表所述的功能:
+     *      0               复制回内容并释放elems 缓冲区
+     *      JNI_COMMIT      复制回内容但不释放elems 缓冲区
+     *      JNI_ABORT       释放缓冲区但不复制回变化
+     */    
+    void  Release<PrimitiveType>ArrayElements (JNIEnv *env, ArrayType array, NativeType *elems, jint mode); 
+```
+**不管布尔数组在 Java 虚拟机中如何表示，GetBooleanArrayElements() 将始终返回一个 jbooleans 类型的指针，其中每一
+　字节代表一个元素（开包表示）。内存中将确保所有其它类型。**  
+|GetPrimitiveTypeArrayElements    |NativeType   |ArrayType     |  
+|-----------------------          |-------------|------------  |  
+|GetBooleanArrayElements()        |jboolean     |jbooleanArray |  
+|GetByteArrayElements()           |jbyte        |jbyteArray    |  
+|GetCharArrayElements()           |jchar        |jcharArray    |  
+|GetShortArrayElements()          |jshort       |jshortArray   |  
+|GetIntArrayElements()            |jint         |jintArray     |   
+|GetLongArrayElements()           |jlong        |jlongArray    |  
+|GetFloatArrayElements()          |jfloat       |jfloatArray   |  
+|GetDoubleArrayElements()         |jdouble      |jdoubleArray  | 
+
+Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveType>ArrayElements对应，不再列出
+
+####Get<PrimitiveType>ArrayRegion与Set<PrimitiveType>ArrayRegion
+```java
+    /**
+     * 将基本类型数组某一区域复制到缓冲区中的一组函数, 使用时替换PrimitiveType， ArrayType，和NativeType，
+     * 如GetBooleanArrayRegion() ，jbooleanArray和jboolean
+     *
+     * @param array Java数组 
+     * @param start 起始位置
+     * @param len   要复制的长度
+     * @param buf   目标缓冲区
+     * @throw ArrayIndexOutOfBoundsException 如果区域中的某个下标无效
+     */
+    void  Get<PrimitiveType>ArrayRegion (JNIEnv *env, ArrayType array, jsize start, jsize len, NativeType *buf);
+  
+    /**
+     * 将基本类型数组的某一区域从缓冲区中复制回来的一组函数，使用时替换PrimitiveType， ArrayType，和NativeType，
+     * 如SetBooleanArrayRegion() ，jbooleanArray和jboolean
+     *
+     * @param array Java数组
+     * @param start 起始位置
+     * @param len   写回的长度
+     * @param buf   源缓冲区
+     * @throw   ArrayIndexOutOfBoundsException：如果区域中的某个下标无效
+     */    
+    void  Set<PrimitiveType>ArrayRegion (JNIEnv *env, ArrayType array, jsize start, jsize len, NativeType *buf);
+```
+
 ###访问对象的属性和方法
 ```java
     /**
