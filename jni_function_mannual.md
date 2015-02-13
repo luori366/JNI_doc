@@ -263,6 +263,7 @@ jint GetVersion(JNIEnv *env);
      * @param string Java 字符串对象
      * @return ava 字符串的长度
      * @throw
+     */
     jsize  GetStringLength (JNIEnv *env, jstring string);
 
     /**
@@ -331,5 +332,143 @@ jint GetVersion(JNIEnv *env);
      */
 ```
 ###访问对象的属性和方法
+```java
+    /**
+     * 返回Java类（非静态）域的属性ID。该域由其名称及签名指定。访问器函数的Get<type>Field 及 Set<type>Field
+     *  系列使用域 ID 检索对象域。GetFieldID() 不能用于获取数组的长度域。应使用GetArrayLength()。
+     *
+     * @param clazz Java 类对象
+     * @param name  该属性的Name名称
+     * @param sig   该属性的域签名
+     * @return 属性ID对象。如果操作失败，则返回NULL
+     * @throw NoSuchFieldError  如果找不到指定的域
+     *      ExceptionInInitializerError 如果由于异常而导致类初始化程序失败
+     *      OutOfMemoryError 如果系统内存不足
+     */
+    jfieldID  GetFieldID (JNIEnv *env, jclass clazz, const char *name, const char *sig); 
+    
+    // 获取类的静态域ID方法
+    jfieldID  GetStaticFieldID (JNIEnv *env,jclass clazz, const char *name, const char *sig);
+    
+    /**
+     * 返回类或接口实例（非静态）方法的方法 ID。方法可在某个 clazz 的超类中定义，也可从 clazz 继承。该方法由其名称
+     * 和签名决定。 GetMethodID() 可使未初始化的类初始化。要获得构造函数的方法 ID，应将 <init> 作为方法名，同时将 
+     * void (V) 作为返回类型
+     
+     * @param clazz Java类对象
+     * @param name  该方法的Name名称
+     * @param sig   该方法参数和返回值域签名     *
+     * @return 方法ID，如果找不到指定的方法，则为NULL
+     *
+     * @throw NoSuchMethodError 如果找不到指定方法
+     *      ExceptionInInitializerError 如果由于异常而导致类初始化程序失败
+     *      OutOfMemoryError 如果系统内存不足
+     */
+    jmethodID GetMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+    
+    // 获取类对象的静态方法ID
+    jfieldID  GetStaticMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+```
+####Get<type>Field Routines
+```java
+    /**
+     * 该例程系列返回对象的实例（非静态）域的值。要访问的域由通过调用GetFieldID()而得到的域ID指定。
+     *
+     * @param obj Java对象（不能为 NULL）
+     * @param fieldID 有效的域 ID
+     * @return  属性的内容
+     * 方法族：Get<type>Field  NativeType 
+     * GetObjectField()        jobject
+     * GetBooleanField()       jboolean
+     * GetByteField()          jbyte 
+     * GetCharField()          jchar   
+     * GetShortField()         jshort
+     * GetIntField()           jint     
+     * GetLongField()          jlong   
+     * GetFloatField()         jfloat
+     * GetDoubleField()        jdouble 
+     */
+    NativeType Get<type>Field (JNIEnv*env, jobject obj, jfieldID fieldID);  
+    
+    // 获取类对象静态域的值
+    NativeType GetStatic<type>Field (JNIEnv*env, jclass classzz, jfieldID fieldID);  
+```
+####Set<type>Field Routines
+```java
+    /**
+     * 该惯用法设置对象的实例（非静态）属性的值。要访问的属性由通过调用SetFieldID() 而得到的属性 ID指定。
+     *
+     * @param obj Java  对象（不能为 NULL）
+     * @param fieldId   有效的域 ID
+     * @param value     域的新值
+     * 方法族：Set<type>Field       NativeType
+     * SetObjectField()             jobject
+     * SetBooleanField()            jboolean  
+     * SetByteField()               jbyte
+     * SetCharField()               jchar
+     * SetShortField()              jshort
+     * SetIntField()                jint 
+     * SetLongField()               jlong
+     * SetFloatField()              jfloat 
+     * SetDoubleField()             jdouble
+     */
+    void  Set<type>Field (JNIEnv *env, jobject obj, jfieldID fieldID, NativeType value);
+    
+    // 设置类的静态域的值
+    void  SetStatic<type>Field (JNIEnv *env, jclass classzz, jfieldID fieldID, NativeType value);  
+```
+####Call<type>Method<arglist>例程
+```java
+    /**
+     * 这三个操作的方法用于从本地方法调用Java 实例方法。它们的差别仅在于向其所调用的方法传递参数时所用的机制。   
+     * 这三个操作将根据所指定的methodID调用Java 对象的实例（非静态）方法。参数 methodID 必须通过调用 GetMethodID() 
+     * 来获得。当这些函数用于调用私有方法和构造函数时，methodID必须从obj 的真实类派生而来，而不应从其某个超类派生。
+     * 当然，附加参数可以为空 。
+     *
+     * @param obj Java对象
+     * @param methodId 方法ID
+     * 方法族：Call<type>Method<A/V>    NativeType
+     * CallVoidMethod()                 无
+     * CallObjectMethod()               jobect
+     * CallBooleanMethod ()             jboolean
+     * CallByteMethod()                 jbyte
+     * CallCharMethod()                 jchar
+     * CallShortMethod()                jshort 
+     * CallIntMethod()                  jint  
+     * CallLongMethod()                 jlong
+     * CallFloatMethod()                jfloat
+     * CallDoubleMethod()               jdouble
+     */
+    NativeType Call<type>Method (JNIEnv *env, jobject obj, jmethodID methodID, ...);     //参数附加在函数后面,
+    NativeType Call<type>MethodA (JNIEnv *env, jobject obj, jmethodID methodID, jvalue *args);  //参数以指针形式附加
+    NativeType Call<type>MethodV (JNIEnv *env, jobject obj,jmethodID methodID, va_list args); //参数以"链表"形式附加
+```
 ###注册本地方法
+```java
+    /**
+     * 向clazz参数指定的类注册本地方法。
+     *
+     * @param clazz 目标类对象
+     * @param methods JNINativeMethod结构数组，其中包含本地方法的名称、签名和函数指针
+     *  JNINativeMethod定义如下：
+     *      typedef struct {                       
+     *          char *name;          
+     *          char *signature;               
+     *          void *fnPtr;               
+     *      } JNINativeMethod;  
+     * 
+     * @param nMethods methods参数的长度
+     * @return 成功时返回0；失败时返回负数
+     * @throw  NoSuchMethodError 如果找不到指定的方法或方法不是本地方法
+     */
+    jint RegisterNatives(JNIEnv *env, jclass clazz, const JNINativeMethod *methods, jint nMethods); 
+    /**
+     * 反注册类的本地方法。类将返回到链接或注册了本地方法函数前的状态。该函数不应在本地代码中使用。
+     *  相反，它可以为某些程序提供一种重新加载和重新链接本地库的途径。   
+     *
+     * @param clazz Java类对象
+     * @throw 成功时返回0；失败时返回负数
+     */
+    jint UnregisterNatives (JNIEnv *env, jclass clazz); 
+```
 
