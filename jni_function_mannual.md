@@ -244,18 +244,7 @@ jint GetVersion(JNIEnv *env);
      */    
     jbooleanIsSameObject (JNIEnv *env, jobject ref1, jobject ref2);  
 ```
-```java
-    /**
-     * 
-     *
-     * @param
-     * @param
-     * @param
-     * @param
-     * @return
-     * @throw
-     */
-```
+
 ###字符串操作
 ```java
     /**
@@ -275,8 +264,72 @@ jint GetVersion(JNIEnv *env);
      * @return ava 字符串的长度
      * @throw
     jsize  GetStringLength (JNIEnv *env, jstring string);
+
+    /**
+     * 返回指向字符串的Unicode字符数组的指针。该指针在调用 ReleaseStringchars() 前一直有效。          
+     * 如果 isCopy 非空，则在复制完成后将 *isCopy 设为 JNI_TRUE。如果没有复制，则设为JNI_FALSE
+     *
+     * @param string Java 字符串对象
+     * @param isCopy 指向布尔值的指针
+     * @return 指向 Unicode 字符串的指针，如果操作失败，则返回NULL
+     */
+    const jchar * GetStringChars(JNIEnv*env, jstring string, jboolean *isCopy); 
+
+    /**
+     * 通知本地代码不要再访问 chars。参数chars 是一个指针，可通过 GetStringChars() 从 string 获得
+     *
+     * @param chars 指向 Unicode 字符串的指针
+     */    
+    void ReleaseStringChars(JNIEnv *env, jstring string, const jchar *chars); 
+
+    /**
+     * 利用UTF-8字符数组构造新java.lang.String对象
+     *
+     * @param bytes 指向UTF-8字符串的指针
+     * @return Java 字符串对象。如果无法构造该字符串，则为NULL
+     * @throw OutOfMemoryError 如果系统内存不足
+     */    
+    jstring  NewStringUTF (JNIEnv *env, const char *bytes);
+
+    /**
+     * 以字节为单位返回字符串的 UTF-8 长度
+     *
+     * @param string Java字符串对象
+     * @return  返回字符串的长度
+     */    
+    jsize  GetStringUTFLength (JNIEnv *env, jstring string);
+
+    /**
+     * 返回指向字符串的UTF-8字符数组的指针。该数组在被ReleaseStringUTFChars()释放前将一直有效。    
+     * 如果isCopy不是 NULL，*isCopy 在复制完成后即被设为JNI_TRUE。如果未复制，则设为 JNI_FALSE。
+     *
+     * @param string Java 字符串对象
+     * @param isCopy 指向布尔值的指针
+     * @return 指向 UTF-8 字符串的指针。如果操作失败，则为 NULL
+     */    
+    const char* GetStringUTFChars (JNIEnv*env, jstring string, jboolean *isCopy);
+    
+    /**
+     * 通知本地代码不要再访问 utf。utf 参数是一个指针，可利用 GetStringUTFChars() 获得
+     *
+     * @param string Java字符串对象
+     * @param utf 指向UTF-8字符串的指针
+     */    
+    void  ReleaseStringUTFChars (JNIEnv *env, jstring string,  const char *utf); 
 ```
 ###数组操作
+```java
+    /**
+     *
+     *
+     * @param
+     * @param
+     * @param
+     * @param
+     * @return
+     * @throw
+     */
+```
 ###访问对象的属性和方法
 ###注册本地方法
 
