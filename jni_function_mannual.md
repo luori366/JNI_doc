@@ -103,18 +103,7 @@ jint GetVersion(JNIEnv *env);
      */    
     jboolean IsAssignableFrom (JNIEnv *env, jclass clazz1,  jclass clazz2); 
 ```
-```java
-    /**
-     * 
-     *
-     * @param
-     * @param
-     * @param
-     * @param
-     * @return
-     * @throw
-     */
-```
+
 ###异常操作
 ```java
     /**
@@ -162,10 +151,132 @@ jint GetVersion(JNIEnv *env);
 ```
 
 ###全局及局部引用
+```java
+    /**
+     * 创建 obj 参数所引用对象的新全局引用, 创建的引用要通过调用DeleteGlobalRef() 来显式撤消
+     *
+     * @param obj 全局或局部引用
+     * @return 返回全局引用，如果系统内存不足则返回 NULL
+     */
+    object NewGlobalRef (JNIEnv *env, jobject obj); 
+    
+    /**
+     * 删除 globalRef 所指向的全局引用
+     *
+     * @param globalRef 全局引用
+     */    
+    void DeleteGlobalRef (JNIEnv *env, jobject globalRef); 
+    
+    /**
+     * 创建 obj 参数所引用对象的局部引用, 创建的引用要通过调用DeleteLocalRef()来显式删除
+     *
+     * @param obj 全局或局部引用
+     * @return 返回局部引用，如果系统内存不足则返回 NULL
+     */    
+    jobject NewLocalRef(JNIEnv *env, jobject ref);
+    
+    /**
+     * 删除 localRef所指向的局部引用
+     *
+     * @param localRef局部引用
+     */    
+    void  DeleteLocalRef (JNIEnv *env, jobject localRef); 
+    
+    /**
+     * 用obj创建新的弱全局引用，
+     * @param obj 全局或局部因哟娜
+     * @return 返回弱全局引用，弱obj指向null，或者内存不足时返回NULL，同时抛出异常
+     */    
+    jweak NewWeakGlobalRef(JNIEnv *env, jobject obj);
+    
+    /**
+     * 删除弱全局引用
+     */    
+    void DeleteWeakGlobalRef(JNIEnv *env, jweak obj);
+```
+
 ###对象操作
+```java
+    /**
+     * 分配新Java对象而不调用该对象的任何构造函数,返回该对象的引用；clazz 参数务必不要引用数组类。
+     *
+     * @param clazz  Java 类对象
+     * @return 返回 Java对象；如果无法构造该对象，则返回NULL
+     * @throw InstantiationException：如果该类为一个接口或抽象类
+     *      OutOfMemoryError：如果系统内存不足
+     */
+    jobject AllocObject (JNIEnv *env, jclass clazz);
+    /**
+     * 构造新Java对象。方法methodId指向应调用的构造函数方法。注意：该ID特指该类class的构造函数ID，必须通过调用 
+     * GetMethodID()获得，且调用时的方法名必须为 <init>，而返回类型必须为 void (V)，clazz参数务必不要引用数组类。
+     *
+     * @return 返回Java对象，如果无法构造该对象，则返回NULL
+     * @throw InstantiationException  如果该类为接口或抽象类
+     *       OutOfMemoryError   如果系统内存不足
+     */    
+    jobject NewObject (JNIEnv *env ,  jclass clazz,  jmethodID methodID, ...);   //参数附加在函数后面
+    jobject NewObjectA (JNIEnv *env , jclassclazz,  jmethodID methodID, jvalue *args);    //参数以指针形式附加 
+    jobjec tNewObjectV (JNIEnv *env , jclassclazz,  jmethodID methodID, va_list args);    //参数以"链表"形式附加
+
+    /**
+     * 返回对象的类
+     *
+     * @param obj  Java对象（不能为 NULL）
+     * @return Java 类对象
+     */    
+    jclass GetObjectClass (JNIEnv *env, jobject obj);  
+    
+    /**
+     * 测试对象是否为某个类的实例
+     *
+     * @param obj Java对象
+     * @param clazz Java类对象
+     * @return 如果可将obj强制转换为clazz，则返回JNI_TRUE。否则返回JNI_FALSE。NULL对象可强制转换为任何类
+     */    
+    jboolean IsInstanceOf (JNIEnv *env, jobject obj, jclass clazz);
+
+    /**
+     * 测试两个引用是否引用同一Java对象
+     *
+     * @param ref1 java对象
+     * @param ref2 java对象
+     * @return 如果ref1和ref2引用同一Java对象或均为NULL，则返回JNI_TRUE。否则返回JNI_FALSE
+     */    
+    jbooleanIsSameObject (JNIEnv *env, jobject ref1, jobject ref2);  
+```
+```java
+    /**
+     * 
+     *
+     * @param
+     * @param
+     * @param
+     * @param
+     * @return
+     * @throw
+     */
+```
 ###字符串操作
+```java
+    /**
+     * 利用Unicode字符数组构造新的java.lang.String对象
+     *
+     * @param 指向Unicode字符串的指针
+     * @param Unicode字符串的长度
+     * @return Java 字符串对象。如果无法构造该字符串，则为NULL.
+     * @throw OutOfMemoryError：如果系统内存不足
+     */
+    jstring  NewString (JNIEnv *env, const jchar *unicodeChars, jsize len);
+
+    /**
+     * 返回Java字符串的长度（Unicode 字符数）
+     *
+     * @param string Java 字符串对象
+     * @return ava 字符串的长度
+     * @throw
+    jsize  GetStringLength (JNIEnv *env, jstring string);
+```
 ###数组操作
 ###访问对象的属性和方法
 ###注册本地方法
-###
-###
+
