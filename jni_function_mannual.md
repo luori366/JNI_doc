@@ -326,10 +326,29 @@ jint GetVersion(JNIEnv *env);
      * @param
      * @param
      * @param
-     * @param
      * @return
      * @throw
      */
+```
+```java
+    /**
+     * 返回数组中的元素数
+     *
+     * @param array Java数组对象
+     * @return 数组的长度
+     */
+    jsize GetArrayLength (JNIEnv *env, jarray array);
+    
+    /**
+     * 构造新的数组，它将保存类 elementClass 中的对象。所有元素初始值均设为 initialElement
+     *
+     * @param
+     * @param length 数组大小
+     * @param elementClass 数组元素类对象
+     * @return initialElement 初始值， 可以为NULL
+     * @throw OutOfMemoryError 如果系统内存不足
+     */
+    jarray NewObjectArray(JNIEnv *env, jsize length, jclass elementClass, jobject initialElement);
 ```
 ###访问对象的属性和方法
 ```java
