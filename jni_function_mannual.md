@@ -364,7 +364,7 @@ jint GetVersion(JNIEnv *env);
      * @return Java 对象
      * @throw ArrayIndexOutOfBoundsException 如果index不是数组中的有效下标
      */    
-    jobject  GetObjectArrayElement (JNIEnv *env, jobjectArray array, jsize index);
+    jobject GetObjectArrayElement (JNIEnv *env, jobjectArray array, jsize index);
  
      /**
      * 设置Object数组的元素
@@ -394,14 +394,14 @@ jint GetVersion(JNIEnv *env);
 
 |NewPrimitiveTypeArray  |ArrayType    |  
 |-----------------------|-------------|   
-|NewBooleanArray()      |jbooleanArray|    
-|NewByteArray()         |jbyteArray   |  
-|NewCharArray()         |jcharArray   |  
-|NewShortArray()        |jshortArray  |  
-|NewIntArray()          |jintArray    |  
-|NewLongArray()         |jlongArray   |  
-|NewFloatArray()        |jfloatArray  |  
-|NewDoubleArray()       | jdoubleArray|  
+|NewBooleanArray()      |jbooleanarray|    
+|NewByteArray()         |jbytearray   |  
+|NewCharArray()         |jchararray   |  
+|NewShortArray()        |jshortarray  |  
+|NewIntArray()          |jintarray    |  
+|NewLongArray()         |jlongarray   |  
+|NewFloatArray()        |jfloatarray  |  
+|NewDoubleArray()       |jdoublearray |  
 
 ####Get<PrimitiveType>ArrayElements与Release<PrimitiveType>ArrayElements惯用法
 ```java
