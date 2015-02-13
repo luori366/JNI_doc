@@ -412,8 +412,6 @@ jint GetVersion(JNIEnv *env);
      */    
     void  Release<PrimitiveType>ArrayElements (JNIEnv *env, ArrayType array, NativeType *elems, jint mode); 
 ```
-**不管布尔数组在 Java 虚拟机中如何表示，GetBooleanArrayElements() 将始终返回一个 jbooleans 类型的指针，其中每一
-　字节代表一个元素（开包表示）。内存中将确保所有其它类型。**  
 |GetPrimitiveTypeArrayElements    |NativeType   |ArrayType     |  
 |-----------------------          |-------------|------------  |  
 |GetBooleanArrayElements()        |jboolean     |jbooleanArray |  
@@ -423,7 +421,7 @@ jint GetVersion(JNIEnv *env);
 |GetIntArrayElements()            |jint         |jintArray     |   
 |GetLongArrayElements()           |jlong        |jlongArray    |  
 |GetFloatArrayElements()          |jfloat       |jfloatArray   |  
-|GetDoubleArrayElements()         |jdouble      |jdoubleArray  | 
+|GetDoubleArrayElements()         |jdouble      |jdoubleArray  |   
 
 Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveType>ArrayElements对应，不再列出
 
