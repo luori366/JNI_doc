@@ -96,12 +96,22 @@ GetStringUTFChars与ReleaseStringUTFChars：获取/是否utf-8字符串的C char
 GetStringUTFRegion：拷贝jstring里的内容到一个achar类型的buf中，通常这个buf是个自动变量
 
 ###jarray(jintarray, jobjectarray...)
-Java数组被JNI转换成jarray对象，通常先要将jarray对象转换成NativeType[], 然后将具体的NativeType转换
-成C/C++可操作的对象。
+Java数组被JNI转换成jarray对象，对于JNI基本类型通常先要将jarray对象转换成NativeType[], 然后将具体的NativeType转换
+成C/C++可操作的对象；对于引用类型有专门的方法来处理
 
-####jarray->NativeType[]
+####构造基本类型jarray
+New<PrimitiveType>Array：用于构造基本类型数组对象
+
+####构造引用类型的jarray
+NewObjectArray：构造引用类型的数组对象，通常是某种java类
+
+####操作基本类型jarray
 Get<PrimitiveType>ArrayElements/Release<PrimitiveType>ArrayElements：获取/释放jarray对象的指针
-Get<Type>ArrayRegion: 拷贝jarray里的元素到一个NativeType类型的buf中，通常这个buf是个自动变量
+Get<PrimitiveType>ArrayRegion: 拷贝jarray里的元素到一个NativeType类型的buf中，通常这个buf是个自动变量
+Set<PrimitiveType>ArrayRegion：将NativeType类型的buf中拷贝一些元素到jarray里
+
+####操作引用类型的jarray
+GetObjectArrayElement/SetObjectArrayElement：根据索引获取/修改引用类型数组的元素
 
 ##类型签名
 在Java和JNI经常会互相相调用方法，其间要保证参数和返回值之间的映射正确，因此二者需要一个协议来保证。
