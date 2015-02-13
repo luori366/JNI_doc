@@ -317,6 +317,23 @@ jint GetVersion(JNIEnv *env);
      * @param utf 指向UTF-8字符串的指针
      */    
     void  ReleaseStringUTFChars (JNIEnv *env, jstring string,  const char *utf); 
+    
+    /*
+     * 从str的偏移位置start开始，复制len长度的unicode字符到buf中
+     */
+    void GetStringRegion(JNIEnv *env, jstring str, jsize start, jsize len, jchar *buf);
+    
+    /*
+     * 将str偏移位置start开始的len长度unicode字符转换为C char字符，并放在buf中
+     */
+    void GetStringUTFRegion(JNIEnv *env, jstring str, jsize start, jsize len, char *buf);
+    
+    /*
+     * 这两个函数的语义与 Get/ReleaseStringChars函数类似，但VM会尽量返回一个指针。但是使用这一对函数时
+     * 必须有严格限制：在这对函数调用之间绝对不能调用其他JNI方法，否则将导致当前线程阻塞。
+     */    
+    const jchar * GetStringCritical(JNIEnv *env, jstring string, jboolean *isCopy);
+    void ReleaseStringCritical(JNIEnv *env, jstring string, const jchar *carray);
 ```
 ###数组操作
 ```java
