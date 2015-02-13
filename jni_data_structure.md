@@ -6,6 +6,8 @@
 Java和JNI之间**相对应**数据类型的转换，由JVM保证；但是JNI与本地代码相对应数据类型的转换，不得不由程序员  
 自己完成，无疑，这是件复杂乏味并且容易出错的事情。
 
+本文档里提到的函数请参考[JNI函数手册](/jni_function_mannual.md)
+
 ##基本类型
 在jni.h中定义了jni基本类型，其本质是某种整型。每种类型与java中的一种基本类型对应
 ```C
@@ -74,6 +76,32 @@ typedef jobject         jweak;              /**/
 
 ###jobject与jclass
 分别对应Java中的对象和类，本地代码对它们的操作需要通过一些列的JNI函数来完成，具体参考[JNI实现](Implementation_jni.md)
+
+###jstring
+Java字符串java.lang.String对象映射到JNI，就是jstring；  
+但是在C/C++中通常是用char *去操作数组的，有时候本地代码也要传递一个jstring给JNI。
+
+####jchar *->jstring
+NewString: 使用jchar指针创建新的jstring对象，此对象可以由JNI返回给Java层
+
+####char *->jstring
+NewStringUTF: 使用const char指针创建一个新的jstring对象，此脆性可以由JNI返回给Java
+
+####jstring->jchar *
+GetStringChars与ReleaseStringChars: 获取/释放unicode字符串的jchar指针
+GetStringRegion：拷贝jstring里的内容到一个jachar类型的buf中，通常这个buf是个自动变量
+
+####jstring->char *
+GetStringUTFChars与ReleaseStringUTFChars：获取/是否utf-8字符串的C char指针
+GetStringUTFRegion：拷贝jstring里的内容到一个achar类型的buf中，通常这个buf是个自动变量
+
+###jarray(jintarray, jobjectarray...)
+Java数组被JNI转换成jarray对象，通常先要将jarray对象转换成NativeType[], 然后将具体的NativeType转换
+成C/C++可操作的对象。
+
+####jarray->NativeType[]
+Get<PrimitiveType>ArrayElements/Release<PrimitiveType>ArrayElements：获取/释放jarray对象的指针
+Get<Type>ArrayRegion: 拷贝jarray里的元素到一个NativeType类型的buf中，通常这个buf是个自动变量
 
 ##类型签名
 在Java和JNI经常会互相相调用方法，其间要保证参数和返回值之间的映射正确，因此二者需要一个协议来保证。
