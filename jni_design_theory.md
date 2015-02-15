@@ -1,4 +1,4 @@
-#JNI的作用与工作原理
+﻿#JNI的作用与工作原理
 ===========================
 本文主要翻译自Java JNI文档。  
 
@@ -137,7 +137,7 @@ Class Cls {
 ###JNIEnv接口指针的组织结构
 JNIEnv是一个指向本地线程数据的接口指针，这个指针里面包含了一个指向函数表的指针。每一个接口函数在这表中都有一个
 预定义的偏移位置。JNIEnv很像一个C++虚函数表或者Microsoft COM接口。
-![JNIEnv interface pointer](/jnienv.png)  
+![JNIEnv interface pointer](/res/jnienv.png)  
 - 如果一个函数实现了一个本地方法，那么这个函数的第一个参数就是一个JNIEnv接口指针。
 - 从同一个线程中调用的本地方法，传入的JNIEnv指针是相同的。
 - 本地方法可能被不同的线程调用，这时，传入的JNIEnv指针是不同的。但JNIEnv间接指向的函数表在多个线程间是共享的。
