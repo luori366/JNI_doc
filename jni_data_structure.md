@@ -88,11 +88,11 @@ NewString: 使用jchar指针创建新的jstring对象，此对象可以由JNI返
 NewStringUTF: 使用const char指针创建一个新的jstring对象，此脆性可以由JNI返回给Java
 
 ####jstring->jchar *
-GetStringChars与ReleaseStringChars: 获取/释放unicode字符串的jchar指针
+GetStringChars与ReleaseStringChars: 获取/释放unicode字符串的jchar指针；  
 GetStringRegion：拷贝jstring里的内容到一个jachar类型的buf中，通常这个buf是个自动变量
 
 ####jstring->char *
-GetStringUTFChars与ReleaseStringUTFChars：获取/是否utf-8字符串的C char指针
+GetStringUTFChars与ReleaseStringUTFChars：获取/是否utf-8字符串的C char指针；  
 GetStringUTFRegion：拷贝jstring里的内容到一个achar类型的buf中，通常这个buf是个自动变量
 
 ###jarray(jintarray, jobjectarray...)
