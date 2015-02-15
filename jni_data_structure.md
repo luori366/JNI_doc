@@ -121,7 +121,7 @@ GetObjectArrayElement/SetObjectArrayElement：根据索引获取/修改引用类
 |----------------       |------               |  
 |Z                      |boolean              |  
 |B                      |byte                 |  
-|C                      |S                    |  
+|C                      |char                 |  
 |I                      |int                  |  
 |J                      |long                 |  
 |F                      |float                |  
