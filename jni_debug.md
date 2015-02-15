@@ -116,15 +116,11 @@ typedef _jobject*       jweak;
 以GetArrayLength为例，C和C++中的定义：
 ```C
 struct _JNIEnv;             //前置声明，后面将正式声明
-struct _JavaVM;
-typedef const struct JNINativeInterface* C_JNIEnv;
 
 #if defined(__cplusplus)
 typedef _JNIEnv JNIEnv;     //在C++中，JNIEnv是_JNIEnv的别名，本质是一个类
-typedef _JavaVM JavaVM;
 #else
-typedef const struct JNINativeInterface* JNIEnv;    //在C中JNIEnv是JNINativeInterface结构的指针，本质是一个指针
-typedef const struct JNIInvokeInterface* JavaVM;
+typedef const struct JNINativeInterface * JNIEnv;    //在C中JNIEnv是JNINativeInterface结构的指针，本质是一个指针
 #endif
 
 
@@ -154,7 +150,7 @@ struct _JNIEnv {
 };
 ```
 
-因此调用JNI里的方法
+JNIEnv的实现方式不同，影响了它的使用方式
 ```C
 // JNIEnv通常是以JNIEnv *env的指针传进jni方法里的
 jsize len = (*env)->GetArrayLength(env, array);  //C中的使用方式
