@@ -156,3 +156,58 @@ JNIEnv的实现方式不同，影响了它的使用方式
 jsize len = (*env)->GetArrayLength(env, array);  //C中的使用方式
 jsize len =env->GetArrayLength(array);          //C++中的使用方式
 ```
+
+##JNI中汉字的处理
+java内部是使用的16bit的unicode编码（utf-16）来表示字符串的，无论英文还是中文都是2字节；  
+C/C++使用的是原始数据，ascii就是一个字节，中文一般是GB2312编码，用2个字节表示一个汉字。
+
+###java unicode字符串->C/C++ 汉字
+java字符串映射到JNI层是jstring类型，
+- 如果其中不包含汉字，可以调用GetStringUTFChars/GetStringChars将它转化成一个UTF-8/UTF-16字符串；
+- 如果包含字符串，则需要使用java.lang.String的API先将它转化成一个jbytearray，然后将这个jarray对象
+里的内容复制到char类型的内存中。
+
+```C
+// GetStringUnicodeChars: Unicode字符串->char *
+// GetStringChars: Unicode字符串->jchar *
+// GetStringUTFChars: Utf-8字符串->char *
+char * GetStringUnicodeChars(JNIEnv* env, jstring jsrc, const char * encoding) {
+	char* rtn = NULL;
+
+	jclass clazz = (*env)->FindClass(env, "java/lang/String");
+	jmethodID methodID = (*env)->GetMethodID(env, clazz, "getBytes", "(Ljava/lang/String;)[B");
+	jstring jencoding = (*env)->NewStringUTF(env, encoding);
+	jbyteArray jbyte_array = (jbyteArray)(*env)->CallObjectMethod(env, jsrc, methodID, jencoding);
+
+	jsize byte_array_len = (*env)->GetArrayLength(env, jbyte_array);
+	jbyte * jbyte_array_ptr = (*env)->GetByteArrayElements(env, jbyte_array, JNI_FALSE);
+	if (byte_array_len > 0) {
+		rtn = (char*) malloc(byte_array_len + 1);
+		memcpy(rtn, jbyte_array_ptr, byte_array_len);
+		rtn[byte_array_len] = 0;
+	}
+	(*env)->ReleaseByteArrayElements(env, jbyte_array, jbyte_array_ptr, 0);
+
+	return rtn;
+}
+```
+###C/C++ 汉字->Java unicode字符串
+jni返回给java的字符串，c/c++首先应该负责把这个字符串变成UTF-8或者UTF-16格式，然后通过NewStringUTF或者
+NewString来把它封装成jstring，返回给java就可以了。
+- 如果字符串中不含中文字符，只是标准的ascii码，那么用NewString/NewStringUTF就可以构造返回结果；
+- 如果字符串中有中文字符，那么需要用Java String的API来构造jstring，其本质是调用String的构造函数
+public String (byte[] data, String charsetName)
+```C
+//NewStringUnicode:Unicode char * -> jstring
+//NewString: jchar * -> jstring
+//NewStringUTF: UTF char *-> jstring
+jstring NewStringUnicode(JNIEnv * env, const char * src, const char * encoding) {
+	jbyteArray byte_array = (*env)->NewByteArray(env, strlen(src));
+	(*env)->SetByteArrayRegion(env, byte_array, 0, strlen(src), (jbyte*) src);
+	jstring jencoding = (*env)->NewStringUTF(env, encoding);
+
+	jclass clazz = (*env)->FindClass(env, "java/lang/String");
+	jmethodID methodID = (*env)->GetMethodID(env, clazz, "<init>", "([BLjava/lang/String;)V");
+	return (jstring)(*env)->NewObject(env, clazz, methodID, byte_array, jencoding);
+}
+```
