@@ -75,7 +75,7 @@ typedef jobject         jweak;              /**/
 ```
 
 ###jobject与jclass
-分别对应Java中的对象和类，本地代码对它们的操作需要通过一些列的JNI函数来完成，具体参考[JNI实现](Implementation_jni.md)
+分别对应Java中的对象和类，本地代码对它们的操作需要通过一些列的JNI函数来完成，具体参考[JNI实现](jni_implementation.md)
 
 ###jstring
 Java字符串java.lang.String对象映射到JNI，就是jstring；  
