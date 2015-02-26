@@ -111,7 +111,7 @@ Get<PrimitiveType>ArrayElements/Release<PrimitiveType>ArrayElements：获取/释
 GetPrimitiveArrayCritical与ReleasePrimitiveArrayCritical：如果可能，获取/释放原jarray对象指针，否则对象拷贝的指针
 
 ####通过数组拷贝操作基本类型数组
-Get<PrimitiveType>ArrayRegion: 拷贝jarray里的元素到一个NativeType类型的buf中，通常这个buf是个自动变量
+Get<PrimitiveType>ArrayRegion: 拷贝jarray里的元素到一个NativeType类型的buf中，通常这个buf是个自动变量  
 Set<PrimitiveType>ArrayRegion：将NativeType类型的buf中拷贝一些元素到jarray里
 
 ##类型签名
