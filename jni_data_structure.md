@@ -107,7 +107,7 @@ NewObjectArray：构造引用类型的数组对象，通常是某种java类
 GetObjectArrayElement/SetObjectArrayElement：根据索引获取/修改引用类型数组的元素
 
 ####通过jarray的指针操作数组
-Get<PrimitiveType>ArrayElements/Release<PrimitiveType>ArrayElements：获取/释放jarray对象的指针  
+Get<PrimitiveType>ArrayElement/Release<PrimitiveType>ArrayElement：获取/释放jarray对象的指针  
 GetPrimitiveArrayCritical与ReleasePrimitiveArrayCritical：如果可能，获取/释放原jarray对象指针，否则对象拷贝的指针
 
 ####通过数组拷贝操作基本类型数组
