@@ -103,14 +103,16 @@ Java数组被JNI转换成jarray对象，对于JNI基本类型通常先要将jarr
 New<PrimitiveType>Array：用于构造基本类型数组对象  
 NewObjectArray：构造引用类型的数组对象，通常是某种java类
 
+####操作数组元素
+GetObjectArrayElement/SetObjectArrayElement：根据索引获取/修改引用类型数组的元素
+
 ####通过jarray的指针操作数组
 Get<PrimitiveType>ArrayElements/Release<PrimitiveType>ArrayElements：获取/释放jarray对象的指针  
-Get<PrimitiveType>ArrayRegion: 拷贝jarray里的元素到一个NativeType类型的buf中，通常这个buf是个自动变量  
-Set<PrimitiveType>ArrayRegion：将NativeType类型的buf中拷贝一些元素到jarray里  
 GetPrimitiveArrayCritical与ReleasePrimitiveArrayCritical：如果可能，获取/释放原jarray对象指针，否则对象拷贝的指针
 
-####通过jarray的元素操作数组
-GetObjectArrayElement/SetObjectArrayElement：根据索引获取/修改引用类型数组的元素
+####通过数组拷贝操作基本类型数组
+Get<PrimitiveType>ArrayRegion: 拷贝jarray里的元素到一个NativeType类型的buf中，通常这个buf是个自动变量
+Set<PrimitiveType>ArrayRegion：将NativeType类型的buf中拷贝一些元素到jarray里
 
 ##类型签名
 在Java和JNI经常会互相相调用方法，其间要保证参数和返回值之间的映射正确，因此二者需要一个协议来保证。
