@@ -414,7 +414,7 @@ jint GetVersion(JNIEnv *env);
      * @param isCopy 如果isCopy不是NULL，*isCopy在复制完成后即被设为JNI_TRUE; 如果未复制，则设为JNI_FALSE
      * @return 返回指向数组的指针，如果操作失败，则为 NULL
      */
-    NativeType *Get<PrimitiveType>ArrayElements (JNIEnv *env, ArrayType array, jboolean *isCopy); 
+    NativeType * Get<PrimitiveType>ArrayElements (JNIEnv *env, ArrayType array, jboolean *isCopy); 
 
     /**
      * 释放elems，通知本地代码不要再访问elems
@@ -467,6 +467,17 @@ Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveTy
      * @throw   ArrayIndexOutOfBoundsException：如果区域中的某个下标无效
      */    
     void  Set<PrimitiveType>ArrayRegion (JNIEnv *env, ArrayType array, jsize start, jsize len, NativeType *buf);
+```
+
+####GetPrimitiveArrayCritical与ReleasePrimitiveArrayCritical
+```java
+    /*
+     * 作用同Get/Release<primitivetype>ArrayElements相同，但是VM尽可能返回原java数组的指针，否则返回一份拷贝。
+     * 这两组调用之间不能调用其他JNI函数或进行其他系统调用，否则会导致线程阻塞。
+     *
+     */
+    void * GetPrimitiveArrayCritical(JNIEnv *env, jarray array, jboolean *isCopy);
+    void ReleasePrimitiveArrayCritical(JNIEnv *env, jarray array, void *carray, jint mode);
 ```
 
 ###访问对象的属性和方法
