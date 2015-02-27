@@ -621,3 +621,7 @@ Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveTy
     jint UnregisterNatives (JNIEnv *env, jclass clazz); 
 ```
 
+###反射支持
+TODO
+###JVM接口
+TODO
