@@ -25,5 +25,5 @@ JNI常用函数手册
 [jni_header](/jni_header.md)
 JNI头文件原理及其产生
 
-[jni_implementation.md](/jni_implementation.md)
+[jni_implementation](/jni_implementation.md)
 JNI实现方式
