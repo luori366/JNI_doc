@@ -211,3 +211,14 @@ jstring NewStringUnicode(JNIEnv * env, const char * src, const char * encoding) 
 	return (jstring)(*env)->NewObject(env, clazz, methodID, byte_array, jencoding);
 }
 ```
+
+##Eclipse 安装cdt插件
+Eclipse里如果没有安装cdt插件，工程里的jni代码会有各种警告，并且不能进行变量或函数调跳转（Ctrl+Left）
+###安装与eclipse版本对应的cdt插件
+Eclipse 4.3 (Kepler): http://download.eclipse.org/tools/cdt/releases/kepler
+Eclipse 4.2 (Juno): http://download.eclipse.org/tools/cdt/releases/juno
+Eclipse 3.7 (Indigo): http://download.eclipse.org/tools/cdt/releases/indigo
+Eclipse 3.6 (Helios): http://download.eclipse.org/tools/cdt/releases/helios
+Eclipse 3.5 (Galileo): http://download.eclipse.org/tools/cdt/releases/galileo
+
+//TODO
