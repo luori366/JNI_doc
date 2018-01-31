@@ -1,11 +1,11 @@
-﻿#使用javah命令生成C/C++头文件
-=============================
+﻿# 使用javah命令生成C/C++头文件
+
 本文档主要介绍javah的用法，以及怎样用它来生成jni类型的头文件
 
-##jni中头文件的作用
+## jni中头文件的作用
 ![Head file](/res/head.png)
 
-##javah的man文档翻译
+## javah的man文档翻译
 ```
 javah
   javah - 用于生成C（和C++，以下略）方法原型和头文件
@@ -64,7 +64,7 @@ ENVIRONMENT VARIABLES
   一个系统环境变量，用冒号分开(linux下，windows下用分号隔开)。为java程序提供了默认的查找路径。
 ```
 
-##命令行用法示例
+## 命令行用法示例
 假设我的文件系统中有这样的一个文件：
 /home/user/android-4.4/packages/inputmethods/PinyinIME/src/com/android/inputmethod/pinyin/PinyinDecoderService.java
 里面定义了很多native方法，我想生成它的头文件，当前我的工作目录是/home/user
@@ -85,7 +85,7 @@ javah -d . -jni -classpath . PinyinDecoderService
 #这样做当前路径下就生成了一个头文件：PinyinDecoderService.h
 ```
 
-##Eclipse中的配置和用法
+## Eclipse中的配置和用法
 如果想在eclipse中使用外部命令的方式使用javah生成某个文件的头文件，需要做一些配置，参考
 [Eclipse中一键调用javah生成jni的头文件](http://blog.csdn.net/s098668/article/details/8255734)
 
