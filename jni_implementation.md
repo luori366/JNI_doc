@@ -1,12 +1,12 @@
-#实现jni头文件
-============================
+# 实现jni头文件
+
 本文档主要介绍如何实现jni头文件，包括JNI函数宏，JNI数据类型，Java，JNI和C/C++之间的数据传递；
 JNI调用JVM，动态注册本地方法等等。
 本文档里提到的JNI函数的更详细说明请查看：[JNI函数手册](/jni_function_mannual.md)
 
-##Java调用JNI  
+## Java调用JNI  
 
-###通过头文件实现jni方法
+### 通过头文件实现jni方法
 在[JNI_design](/jni_design_theory.md)中的<b>本地方法链接</b>部分，讲到java程序如何链接到本地方法——名字协议。
 所以头文件并非是必要的，但是在头文件下实现本地方法，方向更明确，更不容易出错，也更符合C/C++风格。
 
@@ -48,7 +48,7 @@ JNIEXPORT jstring JNICALL Java_com_example_testjni_MainActivity_getJniStringB
 #endif
 #endif
 ```
-####extern C
+#### extern C
 ```C
 #ifdef __cplusplus        //如果程序里包含了C++，ze采用extern C声明
 extern "C" {              //C++是C的超集，但是二者的编译器并不相同； 
@@ -62,36 +62,36 @@ extern "C" {              //C++是C的超集，但是二者的编译器并不相
 }
 #endif
 ```
-####jni.h
+#### jni.h
 jni.h文件可以在Android源码或者ndk目录下找到，它包含了很多宏，变量，数据结构和函数的定义。
 
-####JNIEXPORT和JNICALL
+#### JNIEXPORT和JNICALL
 JNIEXPORT和JNICALL是jni.h里的宏定义，表示此函数是要被JNI调用的。
 
-####jstring
+#### jstring
 JNI里的String类型，定义在jni.h,还有其他很多类型的数据类型。它本质上是个jobject:
 ```C
 class _jobject {};
 ```
 更多介绍查看后文。
 
-####关于ndk
+#### 关于ndk
 可参考[Ndk-build配置](http://blog.csdn.net/u012176591/article/details/23018913)
 
-###直接实现jni方法
+### 直接实现jni方法
 当然也可以不用头文件做中介，而直接实现jni方法，但是本地方法的原型需要仔细配置，比较容易出错。
 
-###动态注册本地方法
+### 动态注册本地方法
 根据jni方法的命名规范，将导致冗长的方法命名，使用起来也不方便。可以不使用这种链接本地方法的规范，而使用
 动态注册的方式实现java中定义的函数，到本地函数的映射。
 
-####静态注册与动态注册
+#### 静态注册与动态注册
 通过——java函数原型，生成标准jni头文件，实现头文件，编译加载库，java运行时链接本地方法，完成调用——这样的方式使用
 JNI，由jni本身去保证java方法和本地方法的链接，这样的本地方法的注册方式成为静态注册；
 而直接从java函数原型映射到本地方法，编译加载库，用额外的操作保证java函数原型链接到本地方法，完成调用——这样的方
 式使用jni，本地方法的注册方式称为动态注册。其中“额外的操作”要由我们完成。
 
-####java函数原型
+#### java函数原型
 假设在java文件里声明了一个函数原型:
 ```java
 private static native String nativeGetJniStringD();
@@ -104,7 +104,7 @@ JNIEXPORT jstring JNICALL nativeGetJniStringD
 }
 ```
 
-####构造JNINativeMethod数组
+#### 构造JNINativeMethod数组
 首先我们要构造一个JNINativeMethod数组，JNINativeMethod在jni.h中定义：
 ```C
 typedef struct {
@@ -122,7 +122,7 @@ static JNINativeMethod gMethods[] = {
 };
 ```
 
-####注册单个类里的本地方法
+#### 注册单个类里的本地方法
 假设已经为单个类的本地方法建立了一个JNINativeMethod数组，可以这样去注册它：
 ```C
 /*
@@ -143,7 +143,7 @@ static int registerNativeMethods(JNIEnv * env, const char* className,
 }
 ```
 
-####为所有类注册本地方法
+#### 为所有类注册本地方法
 ```C
 /*
  * 为所有java类注册本地方法，示例只有一个类
@@ -159,7 +159,7 @@ static int registerNatives(JNIEnv * env)
 }
 ```
 
-####实现JNI_onLoad方法
+#### 实现JNI_onLoad方法
 JNI_onLoad方法在jni.h中定义，它在java类调用System.LoadLibarary方法后调用，去注册本地方法。
 ```C
 /*
@@ -187,7 +187,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void* reserved)
 }
 ```
 
-###小结
+### 小结
 实现和链接本地方法有三种方式：
 - 通过头文件实现，静态注册
 - 直接实现，静态注册
@@ -195,9 +195,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void* reserved)
 
 三种方式其实互相独立，互不影响。所以在一个实现文件里，可以同时包含这三种实现方式。
 
-##JNI调用java
+## JNI调用java
 
-###一个示例
+### 一个示例
 假设有个java层定义了一个类：
 ```java
 package com.example.calljava;
@@ -292,7 +292,7 @@ void jniCallJava(JNIEnv * env) {
 	}
 }
 ```
-###创建对象
+### 创建对象
 创建java对象，就是要创建一个jobject实例。关于jobject将在jni数据结构里介绍，它的本质是一个结构体指针。
 - 首先创建一个java对象的引用，调用FindClass方法
 - 获取java对象的构造函数的映射，调用GetMethodID
@@ -301,17 +301,17 @@ void jniCallJava(JNIEnv * env) {
 - 通过NewObject生产jni本地对象。
 
 
-###访问public成员
+### 访问public成员
 - 先使用GetFieldID， 获取成员的域对象jfieldID
 - 然后调用Get<type>Field，访问相应的域
 - 可以调用Set<type>Field来修改域成员，要注意此过程里的数据类型转换
 
-###访问public方法
+### 访问public方法
 - 先使用GetMethodID， 获取成员的域对象methodId
 - 然后调用Call<type>Method，Call<type>MethodA或Call<type>MethodV调用相应的Java方法
 
-###访问public static成员
+### 访问public static成员
 与访问public成员方式相同，只要将用到的jni方法换成static版本的即可，比如GetFieldID换成GetStaticFieldID 
 
-###访问public static方法
+### 访问public static方法
 与访问public成员方式相同，只要将用到的jni方法换成static版本的即可
