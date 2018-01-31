@@ -1,14 +1,14 @@
-#JNI调试及其他
-======================
+# JNI调试及其他
+
 本文档主要介绍如何调试JNI，以及其他相关主题
 
-##JNI调试
+## JNI调试
 
-###单步调试
+### 单步调试
 参考[JNI单步调试](http://blog.linguofeng.com/archive/2013/04/18/eclipse-android-ndk-debug.html)
 
-###打印程序
-####使用android_log_print
+### 打印程序
+#### 使用android_log_print
 这是android系统的本地log方法。
 ```C
 typedef enum android_LogPriority {
@@ -50,9 +50,9 @@ int __android_log_print(int prio, const char *tag,  const char *fmt, ...);
 #endif
 ```
 
-##JNI中C/C++本地代码的不同
+## JNI中C/C++本地代码的不同
 
-###引用类型的定义
+### 引用类型的定义
 在C中，引用类型的本质是void指针
 ```C
 /*
@@ -112,7 +112,7 @@ typedef _jthrowable*    jthrowable;
 typedef _jobject*       jweak;
 ```
 
-###JNIEnv定义的不同
+### JNIEnv定义的不同
 以GetArrayLength为例，C和C++中的定义：
 ```C
 struct _JNIEnv;             //前置声明，后面将正式声明
@@ -157,11 +157,11 @@ jsize len = (*env)->GetArrayLength(env, array);  //C中的使用方式
 jsize len =env->GetArrayLength(array);          //C++中的使用方式
 ```
 
-##JNI中汉字的处理
+## JNI中汉字的处理
 java内部是使用的16bit的unicode编码（utf-16）来表示字符串的，无论英文还是中文都是2字节；  
 C/C++使用的是原始数据，ascii就是一个字节，中文一般是GB2312编码，用2个字节表示一个汉字。
 
-###java unicode字符串->C/C++ 汉字
+### java unicode字符串->C/C++ 汉字
 java字符串映射到JNI层是jstring类型，
 - 如果其中不包含汉字，可以调用GetStringUTFChars/GetStringChars将它转化成一个UTF-8/UTF-16字符串；
 - 如果包含字符串，则需要使用java.lang.String的API先将它转化成一个jbytearray，然后将这个jarray对象
@@ -191,7 +191,7 @@ char * GetStringUnicodeChars(JNIEnv* env, jstring jsrc, const char * encoding) {
 	return rtn;
 }
 ```
-###C/C++ 汉字->Java unicode字符串
+### C/C++ 汉字->Java unicode字符串
 jni返回给java的字符串，c/c++首先应该负责把这个字符串变成UTF-8或者UTF-16格式，然后通过NewStringUTF或者
 NewString来把它封装成jstring，返回给java就可以了。
 - 如果字符串中不含中文字符，只是标准的ascii码，那么用NewString/NewStringUTF就可以构造返回结果；
@@ -212,7 +212,7 @@ jstring NewStringUnicode(JNIEnv * env, const char * src, const char * encoding) 
 }
 ```
 
-##Eclipse 安装cdt插件
+## Eclipse 安装cdt插件
 Eclipse里如果没有安装cdt插件，工程里的jni代码会有各种警告，并且不能进行变量或函数调跳转（Ctrl+Left）
 ###安装与eclipse版本对应的cdt插件
 Eclipse 4.3 (Kepler): http://download.eclipse.org/tools/cdt/releases/kepler
