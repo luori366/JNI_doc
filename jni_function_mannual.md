@@ -1,5 +1,5 @@
-##JNI函数手册
-=====================
+## JNI函数手册
+
 JNI所有函数可以在jni.h里找到原型，它们大多定义在JNINativeInterface和JNIInvokeInterface结构里；
 前者的指针就是JNIEnv类型， 后者的指针是JavaVM类型。
 
@@ -34,7 +34,7 @@ truct JNIInvokeInterface {
 };
 ```
 以下对这些函数进行简单分类，并介绍。
-##版本信息
+## 版本信息
 ```java
 /**
  * 获取JNI版本号
@@ -47,7 +47,7 @@ jint GetVersion(JNIEnv *env);
 ```
 **后面再出现 JNIEnv *env 这样的参数不再注释**
 
-###类操作
+### 类操作
 ```java
     /**
      * 从原始类数据的缓冲区中加载类。
@@ -104,7 +104,7 @@ jint GetVersion(JNIEnv *env);
     jboolean IsAssignableFrom (JNIEnv *env, jclass clazz1,  jclass clazz2); 
 ```
 
-###异常操作
+### 异常操作
 ```java
     /**
      * 抛出 java.lang.Throwable 对象
@@ -150,7 +150,7 @@ jint GetVersion(JNIEnv *env);
     void FatalError (JNIEnv *env, const char *msg);  
 ```
 
-###全局及局部引用
+### 全局及局部引用
 ```java
     /**
      * 创建 obj 参数所引用对象的新全局引用, 创建的引用要通过调用DeleteGlobalRef() 来显式撤消
@@ -195,7 +195,7 @@ jint GetVersion(JNIEnv *env);
     void DeleteWeakGlobalRef(JNIEnv *env, jweak obj);
 ```
 
-###对象操作
+### 对象操作
 ```java
     /**
      * 分配新Java对象而不调用该对象的任何构造函数,返回该对象的引用；clazz 参数务必不要引用数组类。
@@ -245,7 +245,7 @@ jint GetVersion(JNIEnv *env);
     jbooleanIsSameObject (JNIEnv *env, jobject ref1, jobject ref2);  
 ```
 
-###字符串操作
+### 字符串操作
 ```java
     /**
      * 利用Unicode字符数组构造新的java.lang.String对象
@@ -335,7 +335,7 @@ jint GetVersion(JNIEnv *env);
     const jchar * GetStringCritical(JNIEnv *env, jstring string, jboolean *isCopy);
     void ReleaseStringCritical(JNIEnv *env, jstring string, const jchar *carray);
 ```
-###数组操作
+### 数组操作
 ```java
     /**
      * 返回数组中的元素数
@@ -378,7 +378,7 @@ jint GetVersion(JNIEnv *env);
     void  SetObjectArrayElement (JNIEnv *env, jobjectArray array,  jsize index, jobject value);
 ```
 
-####New<PrimitiveType>Array Routines
+#### New<PrimitiveType>Array Routines
 ```java
     /**
      * 用于构造基本类型数组对象
@@ -403,7 +403,7 @@ jint GetVersion(JNIEnv *env);
 |NewFloatArray()        |jfloatarray  |  
 |NewDoubleArray()       |jdoublearray |  
 
-####Get<PrimitiveType>ArrayElements与Release<PrimitiveType>ArrayElements惯用法
+#### Get<PrimitiveType>ArrayElements与Release<PrimitiveType>ArrayElements惯用法
 ```java
     /**
      * 一组返回基本类型数组体的函数。结果在调用相应的 Release<PrimitiveType>ArrayElements()函数前将一直有效。
@@ -428,7 +428,8 @@ jint GetVersion(JNIEnv *env);
      *      JNI_ABORT       释放缓冲区但不复制回变化
      */    
     void  Release<PrimitiveType>ArrayElements (JNIEnv *env, ArrayType array, NativeType *elems, jint mode); 
-```
+```  
+
 |GetPrimitiveTypeArrayElements    |NativeType   |ArrayType     |  
 |-----------------------          |-------------|------------  |  
 |GetBooleanArrayElements()        |jboolean     |jbooleanArray |  
@@ -442,7 +443,7 @@ jint GetVersion(JNIEnv *env);
 
 Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveType>ArrayElements对应，不再列出
 
-####Get<PrimitiveType>ArrayRegion与Set<PrimitiveType>ArrayRegion
+#### Get<PrimitiveType>ArrayRegion与Set<PrimitiveType>ArrayRegion
 ```java
     /**
      * 将基本类型数组某一区域复制到缓冲区中的一组函数, 使用时替换PrimitiveType， ArrayType，和NativeType，
@@ -469,7 +470,7 @@ Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveTy
     void  Set<PrimitiveType>ArrayRegion (JNIEnv *env, ArrayType array, jsize start, jsize len, NativeType *buf);
 ```
 
-####GetPrimitiveArrayCritical与ReleasePrimitiveArrayCritical
+#### GetPrimitiveArrayCritical与ReleasePrimitiveArrayCritical
 ```java
     /*
      * 作用同Get/Release<primitivetype>ArrayElements相同，但是VM尽可能返回原java数组的指针，否则返回一份拷贝。
@@ -480,7 +481,7 @@ Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveTy
     void ReleasePrimitiveArrayCritical(JNIEnv *env, jarray array, void *carray, jint mode);
 ```
 
-###访问对象的属性和方法
+### 访问对象的属性和方法
 ```java
     /**
      * 返回Java类（非静态）域的属性ID。该域由其名称及签名指定。访问器函数的Get<type>Field 及 Set<type>Field
@@ -518,7 +519,7 @@ Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveTy
     // 获取类对象的静态方法ID
     jfieldID  GetStaticMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
 ```
-####Get<type>Field Routines
+#### Get<type>Field Routines
 ```java
     /**
      * 该例程系列返回对象的实例（非静态）域的值。要访问的域由通过调用GetFieldID()而得到的域ID指定。
@@ -542,7 +543,7 @@ Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveTy
     // 获取类对象静态域的值
     NativeType GetStatic<type>Field (JNIEnv*env, jclass classzz, jfieldID fieldID);  
 ```
-####Set<type>Field Routines
+#### Set<type>Field Routines
 ```java
     /**
      * 该惯用法设置对象的实例（非静态）属性的值。要访问的属性由通过调用SetFieldID() 而得到的属性 ID指定。
@@ -566,7 +567,7 @@ Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveTy
     // 设置类的静态域的值
     void  SetStatic<type>Field (JNIEnv *env, jclass classzz, jfieldID fieldID, NativeType value);  
 ```
-####Call<type>Method<arglist>例程
+#### Call<type>Method<arglist>例程
 ```java
     /**
      * 这三个操作的方法用于从本地方法调用Java 实例方法。它们的差别仅在于向其所调用的方法传递参数时所用的机制。   
@@ -592,7 +593,7 @@ Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveTy
     NativeType Call<type>MethodA (JNIEnv *env, jobject obj, jmethodID methodID, jvalue *args);  //参数以指针形式附加
     NativeType Call<type>MethodV (JNIEnv *env, jobject obj,jmethodID methodID, va_list args); //参数以"链表"形式附加
 ```
-###注册本地方法
+### 注册本地方法
 ```java
     /**
      * 向clazz参数指定的类注册本地方法。
@@ -621,7 +622,7 @@ Release<PrimitiveType>ArrayElements惯用法里的类型参数与Get<PrimitiveTy
     jint UnregisterNatives (JNIEnv *env, jclass clazz); 
 ```
 
-###反射支持
+### 反射支持
 TODO
-###JVM接口
+### JVM接口
 TODO
